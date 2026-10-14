@@ -7,7 +7,7 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 ## Current State
 
 - One `:app` module; package/namespace and application ID: `com.ngyennhi.vehicleservicesimulator`.
-- `MainActivity` shows the default Compose greeting. There is no dashboard, simulation engine, or Service yet.
+- `MainActivity` shows a Compose dashboard with static sample speed, battery, temperature, and door status. Start/Stop controls are disabled; there is no simulation engine or Service yet.
 - Current configuration: Kotlin 2.2.10, Android Gradle Plugin 9.4.1, Gradle wrapper 9.6.0, Compose Material 3, `minSdk` 26, and `compileSdk`/`targetSdk` 37.
 
 ## MVP Scope
@@ -34,4 +34,4 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 | TASK-005 | Add AIDL communication to practice crossing a process boundary. |
 | TASK-006 | Test key flows, handle lifecycle and error cases, and finish demo documentation. |
 
-The next step is specified in [`tasks/TASK-001.md`](../tasks/TASK-001.md). Start each task only when requested.
+TASK-001 is complete. Start later tasks only when requested.

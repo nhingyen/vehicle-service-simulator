@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">VehicleServiceSimulator</string>
+    <string name="vehicle_name">Demo Vehicle</string>
+    <string name="vehicle_stationary">Stationary</string>
+    <string name="vehicle_moving">Moving</string>
+    <string name="speed_label">Speed</string>
+    <string name="speed_value">%1$d km/h</string>
+    <string name="battery_label">Battery</string>
+    <string name="battery_value">%1$d%%</string>
+    <string name="temperature_label">Temperature</string>
+    <string name="temperature_value">%1$d°C</string>
+    <string name="door_status_label">Door Status</string>
+    <string name="door_open">Open</string>
+    <string name="door_closed">Closed</string>
+    <string name="start_button">Start</string>
+    <string name="stop_button">Stop</string>
 </resources>

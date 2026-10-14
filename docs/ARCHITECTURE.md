@@ -2,16 +2,18 @@
 
 ## Current State
 
-The project has one Android module, `:app`. `MainActivity` calls `setContent` to render the default Compose screen; `ui/theme` contains the default theme. There is no data layer, simulation engine, Android Service, or IPC yet.
+The project has one Android module, `:app`. `VehicleState` is a plain Kotlin model, `SampleVehicleData` provides one static value, and `MainActivity` passes it to `VehicleDashboard`. The dashboard uses the existing Compose theme and displays the state. Start/Stop controls are disabled. There is no simulation engine, Android Service, or IPC yet.
+
+The app uses a dark Material 3 palette by default. Dynamic system colors are disabled by default so the dashboard keeps its defined colors.
 
 ```text
-MainActivity → Compose UI (default greeting)
+VehicleState → SampleVehicleData → MainActivity → VehicleDashboard
 ```
 
-## Planned Evolution
+## Task Evolution
 
 ```text
-TASK-001  Compose Dashboard ← static sample data
+TASK-001  Compose Dashboard ← static sample data (complete)
 TASK-002  Compose Dashboard ← Simulation Engine state
 TASK-003  Simulation Engine ← lifecycle managed by Android Service
 TASK-004  Compose Dashboard ↔ Bound Service ↔ Simulation Engine
