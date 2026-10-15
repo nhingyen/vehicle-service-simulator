@@ -1,0 +1,19 @@
+# Automatically detect text files
+* text=auto
+
+# Source code and configuration
+*.kt text eol=lf
+*.kts text eol=lf
+*.xml text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+gradlew text eol=lf
+
+# Windows scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf

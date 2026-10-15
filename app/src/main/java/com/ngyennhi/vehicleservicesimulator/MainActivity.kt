@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.ngyennhi.vehicleservicesimulator.data.SampleVehicleData
+import androidx.lifecycle.ViewModelProvider
 import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleDashboard
+import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleViewModel
 import com.ngyennhi.vehicleservicesimulator.ui.theme.VehicleServiceSimulatorTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,14 +25,20 @@ class MainActivity : ComponentActivity() {
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
+        val viewModel = ViewModelProvider(this)[VehicleViewModel::class.java]
         setContent {
+            val vehicleState by viewModel.vehicleState.collectAsState()
+            val isRunning by viewModel.isRunning.collectAsState()
             VehicleServiceSimulatorTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
                     VehicleDashboard(
-                        vehicleState = SampleVehicleData.vehicleState,
+                        vehicleState = vehicleState,
+                        isRunning = isRunning,
+                        onStart = viewModel::start,
+                        onStop = viewModel::stop,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

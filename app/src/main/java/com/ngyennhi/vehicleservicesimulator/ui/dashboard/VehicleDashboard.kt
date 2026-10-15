@@ -36,7 +36,13 @@ import com.ngyennhi.vehicleservicesimulator.ui.theme.DashboardNormal
 import com.ngyennhi.vehicleservicesimulator.ui.theme.DashboardWarning
 
 @Composable
-fun VehicleDashboard(vehicleState: VehicleState, modifier: Modifier = Modifier) {
+fun VehicleDashboard(
+    vehicleState: VehicleState,
+    isRunning: Boolean,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -106,8 +112,8 @@ fun VehicleDashboard(vehicleState: VehicleState, modifier: Modifier = Modifier) 
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Button(
-                onClick = {},
-                enabled = false,
+                onClick = onStart,
+                enabled = !isRunning,
                 colors = ButtonDefaults.buttonColors(
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -118,8 +124,8 @@ fun VehicleDashboard(vehicleState: VehicleState, modifier: Modifier = Modifier) 
             }
             Spacer(modifier = Modifier.width(12.dp))
             OutlinedButton(
-                onClick = {},
-                enabled = false,
+                onClick = onStop,
+                enabled = isRunning,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 colors = ButtonDefaults.outlinedButtonColors(
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -187,4 +193,3 @@ private fun MetricCard(
         }
     }
 }
-

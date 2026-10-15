@@ -9,6 +9,18 @@ This file contains the shared project instructions for Codex and Claude Code. Re
 - Run build and test checks appropriate to the completed task, and report the result or why a check could not run.
 - Before finishing, check that documentation matches the code and report the changed files.
 
+## Token-efficient Agent Workflow
+
+- Read only files relevant to the active task.
+- Do not repeatedly summarize known project context.
+- For small, well-scoped tasks, plan briefly and implement.
+- Ask questions only when blocked by important ambiguity.
+- Keep final reports concise.
+- Avoid generating unnecessary documentation.
+- Prefer targeted builds/tests over redundant checks.
+- Reuse existing hooks and GitHub CI.
+- Explain code in detail only when requested.
+
 ## Git and GitHub Workflow
 
 ### Branch Strategy

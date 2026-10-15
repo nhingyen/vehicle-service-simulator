@@ -7,13 +7,13 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 ## Current State
 
 - One `:app` module; package/namespace and application ID: `com.ngyennhi.vehicleservicesimulator`.
-- `MainActivity` shows a Compose dashboard with static sample speed, battery, temperature, and door status. Start/Stop controls are disabled; there is no simulation engine or Service yet.
+- `MainActivity` shows the Compose dashboard using `VehicleViewModel` state. Start runs a simulation tick each second; Stop cancels it. There is no Service yet.
 - Current configuration: Kotlin 2.2.10, Android Gradle Plugin 9.4.1, Gradle wrapper 9.6.0, Compose Material 3, `minSdk` 26, and `compileSdk`/`targetSdk` 37.
 
 ## MVP Scope
 
 - A dashboard displays simulated vehicle state, such as speed, battery/fuel level, temperature, and operating status.
-- Static sample data is later replaced with state generated over time by a simulation engine.
+- A simulation engine generates bounded state over time while the dashboard is running.
 - The simulation moves into an Android Service; the UI then connects through a Bound Service, followed by AIDL practice.
 - Add suitable tests for simulation logic and important integration flows.
 
@@ -34,4 +34,4 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 | TASK-005 | Add AIDL communication to practice crossing a process boundary. |
 | TASK-006 | Test key flows, handle lifecycle and error cases, and finish demo documentation. |
 
-TASK-001 is complete. Start later tasks only when requested.
+TASK-001 and TASK-002 are complete. Start later tasks only when requested.
