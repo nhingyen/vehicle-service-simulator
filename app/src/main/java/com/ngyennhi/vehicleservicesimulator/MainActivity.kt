@@ -1,8 +1,12 @@
 package com.ngyennhi.vehicleservicesimulator
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Color
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -21,16 +25,29 @@ import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleViewModel
 import com.ngyennhi.vehicleservicesimulator.ui.theme.VehicleServiceSimulatorTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: VehicleViewModel
+    private var isBound = false
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+            if (isBound) viewModel.connect(binder as VehicleDataService.LocalBinder)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            viewModel.disconnect()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
-        val viewModel = ViewModelProvider(this)[VehicleViewModel::class.java]
+        viewModel = ViewModelProvider(this)[VehicleViewModel::class.java]
         setContent {
             val vehicleState by viewModel.vehicleState.collectAsState()
             val isRunning by viewModel.isRunning.collectAsState()
+            val isConnected by viewModel.isConnected.collectAsState()
             VehicleServiceSimulatorTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -39,6 +56,7 @@ class MainActivity : ComponentActivity() {
                     VehicleDashboard(
                         vehicleState = vehicleState,
                         isRunning = isRunning,
+                        isConnected = isConnected,
                         onStart = { sendServiceCommand(VehicleDataService.ACTION_START) },
                         onStop = { sendServiceCommand(VehicleDataService.ACTION_STOP) },
                         modifier = Modifier.padding(innerPadding)
@@ -46,6 +64,25 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        isBound = bindService(
+            Intent(this, VehicleDataService::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+        if (!isBound) viewModel.disconnect()
+    }
+
+    override fun onStop() {
+        viewModel.disconnect()
+        if (isBound) {
+            unbindService(serviceConnection)
+            isBound = false
+        }
+        super.onStop()
     }
 
     private fun sendServiceCommand(action: String) {

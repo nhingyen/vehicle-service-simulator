@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">VehicleServiceSimulator</string>
     <string name="vehicle_name">Demo Vehicle</string>
+    <string name="service_connected">Connected</string>
+    <string name="service_disconnected">Disconnected</string>
     <string name="vehicle_stationary">Stationary</string>
     <string name="vehicle_moving">Moving</string>
     <string name="speed_label">Speed</string>

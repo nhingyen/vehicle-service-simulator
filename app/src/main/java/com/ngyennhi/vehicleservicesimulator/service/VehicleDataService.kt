@@ -2,8 +2,10 @@ package com.ngyennhi.vehicleservicesimulator.service
 
 import android.app.Service
 import android.content.Intent
+import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import com.ngyennhi.vehicleservicesimulator.model.VehicleState
 import com.ngyennhi.vehicleservicesimulator.simulation.VehicleSimulationEngine
 import com.ngyennhi.vehicleservicesimulator.simulation.VehicleSimulationState
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -19,6 +22,12 @@ class VehicleDataService : Service() {
     private val engine = VehicleSimulationEngine()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var simulationJob: Job? = null
+    private val binder = LocalBinder()
+
+    inner class LocalBinder : Binder() {
+        val vehicleState: StateFlow<VehicleState> get() = VehicleSimulationState.vehicleState
+        val isRunning: StateFlow<Boolean> get() = VehicleSimulationState.isRunning
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -41,7 +50,7 @@ class VehicleDataService : Service() {
         return START_NOT_STICKY
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")

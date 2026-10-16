@@ -7,7 +7,7 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 ## Current State
 
 - One `:app` module; package/namespace and application ID: `com.ngyennhi.vehicleservicesimulator`.
-- `MainActivity` shows the Compose dashboard using `VehicleViewModel` state. Start/Stop Intent actions control `VehicleDataService`, which runs the simulation once per second. State is shared in process through `VehicleSimulationState`.
+- `MainActivity` binds to `VehicleDataService` while started. Its local Binder exposes vehicle state to `VehicleViewModel`, and the dashboard shows connection status. Start/Stop Intent actions still control the single Service simulation loop, which updates state once per second.
 - Current configuration: Kotlin 2.2.10, Android Gradle Plugin 9.4.1, Gradle wrapper 9.6.0, Compose Material 3, `minSdk` 26, and `compileSdk`/`targetSdk` 37.
 
 ## MVP Scope
@@ -34,4 +34,4 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 | TASK-005 | Add AIDL communication to practice crossing a process boundary. |
 | TASK-006 | Test key flows, handle lifecycle and error cases, and finish demo documentation. |
 
-TASK-001 through TASK-003 are complete. Start later tasks only when requested.
+TASK-001 through TASK-004 are complete. Start later tasks only when requested.

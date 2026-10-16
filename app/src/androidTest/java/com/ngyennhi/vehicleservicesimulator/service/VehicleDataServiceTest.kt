@@ -2,6 +2,7 @@ package com.ngyennhi.vehicleservicesimulator.service
 
 import android.content.Intent
 import android.os.SystemClock
+import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ngyennhi.vehicleservicesimulator.MainActivity
@@ -20,14 +21,19 @@ class VehicleDataServiceTest {
         val context = instrumentation.targetContext
         val activity = instrumentation.startActivitySync(
             Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        )
-        val viewModel = VehicleViewModel()
+        ) as MainActivity
+        lateinit var viewModel: VehicleViewModel
+        instrumentation.runOnMainSync {
+            viewModel = ViewModelProvider(activity)[VehicleViewModel::class.java]
+        }
         val start = Intent(context, VehicleDataService::class.java)
             .setAction(VehicleDataService.ACTION_START)
         val stop = Intent(context, VehicleDataService::class.java)
             .setAction(VehicleDataService.ACTION_STOP)
 
         try {
+            assertTrue(waitUntil { viewModel.isConnected.value })
+            assertFalse(viewModel.isRunning.value)
             context.startService(start)
             context.startService(start)
             assertTrue(waitUntil { viewModel.isRunning.value })
@@ -42,9 +48,56 @@ class VehicleDataServiceTest {
             SystemClock.sleep(1_200)
             assertEquals(stopped, viewModel.vehicleState.value)
             assertFalse(viewModel.isRunning.value)
+            assertTrue(viewModel.isConnected.value)
+            instrumentation.runOnMainSync { activity.finish() }
+            assertTrue(waitUntil { !viewModel.isConnected.value })
         } finally {
             context.stopService(Intent(context, VehicleDataService::class.java))
             instrumentation.runOnMainSync { activity.finish() }
+        }
+    }
+
+    @Test
+    fun startedSimulationSurvivesActivityUnbindAndRebind() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext
+        val firstActivity = instrumentation.startActivitySync(
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ) as MainActivity
+        lateinit var firstViewModel: VehicleViewModel
+        instrumentation.runOnMainSync {
+            firstViewModel = ViewModelProvider(firstActivity)[VehicleViewModel::class.java]
+        }
+        var secondActivity: MainActivity? = null
+
+        try {
+            assertTrue(waitUntil { firstViewModel.isConnected.value })
+            context.startService(
+                Intent(context, VehicleDataService::class.java)
+                    .setAction(VehicleDataService.ACTION_START)
+            )
+            assertTrue(waitUntil { firstViewModel.isRunning.value })
+            instrumentation.runOnMainSync { firstActivity.finish() }
+            assertTrue(waitUntil { !firstViewModel.isConnected.value })
+
+            val reopened = instrumentation.startActivitySync(
+                Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            ) as MainActivity
+            secondActivity = reopened
+            lateinit var secondViewModel: VehicleViewModel
+            instrumentation.runOnMainSync {
+                secondViewModel = ViewModelProvider(reopened)[VehicleViewModel::class.java]
+            }
+            assertTrue(waitUntil { secondViewModel.isConnected.value })
+            assertTrue(secondViewModel.isRunning.value)
+            val stateAtRebind = secondViewModel.vehicleState.value
+            assertTrue(waitUntil(5_000) { secondViewModel.vehicleState.value != stateAtRebind })
+        } finally {
+            context.stopService(Intent(context, VehicleDataService::class.java))
+            instrumentation.runOnMainSync {
+                secondActivity?.finish()
+                firstActivity.finish()
+            }
         }
     }
 

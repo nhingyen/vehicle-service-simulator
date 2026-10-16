@@ -39,6 +39,7 @@ import com.ngyennhi.vehicleservicesimulator.ui.theme.DashboardWarning
 fun VehicleDashboard(
     vehicleState: VehicleState,
     isRunning: Boolean,
+    isConnected: Boolean,
     onStart: () -> Unit,
     onStop: () -> Unit,
     modifier: Modifier = Modifier
@@ -55,6 +56,13 @@ fun VehicleDashboard(
             Text(
                 text = stringResource(R.string.vehicle_name),
                 style = MaterialTheme.typography.headlineMedium
+            )
+            Text(
+                text = stringResource(
+                    if (isConnected) R.string.service_connected else R.string.service_disconnected
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isConnected) DashboardNormal else MaterialTheme.colorScheme.onSurfaceVariant
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
