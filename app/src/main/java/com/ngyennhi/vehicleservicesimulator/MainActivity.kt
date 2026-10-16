@@ -1,5 +1,6 @@
 package com.ngyennhi.vehicleservicesimulator
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
+import com.ngyennhi.vehicleservicesimulator.service.VehicleDataService
 import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleDashboard
 import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleViewModel
 import com.ngyennhi.vehicleservicesimulator.ui.theme.VehicleServiceSimulatorTheme
@@ -37,12 +39,16 @@ class MainActivity : ComponentActivity() {
                     VehicleDashboard(
                         vehicleState = vehicleState,
                         isRunning = isRunning,
-                        onStart = viewModel::start,
-                        onStop = viewModel::stop,
+                        onStart = { sendServiceCommand(VehicleDataService.ACTION_START) },
+                        onStop = { sendServiceCommand(VehicleDataService.ACTION_STOP) },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
+    }
+
+    private fun sendServiceCommand(action: String) {
+        startService(Intent(this, VehicleDataService::class.java).setAction(action))
     }
 }
