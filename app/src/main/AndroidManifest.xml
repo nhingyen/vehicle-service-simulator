@@ -23,6 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".service.VehicleDataService"
+            android:exported="false"
+            android:process=":vehicle" />
     </application>
 
 </manifest>
