@@ -159,9 +159,9 @@ class VehicleDataServiceTest {
         }
 
         try {
-            assertTrue(waitUntil { viewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { viewModel.isConnected.value })
             instrumentation.runOnMainSync { assertTrue(activity.moveTaskToBack(true)) }
-            assertTrue(waitUntil { !viewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { !viewModel.isConnected.value })
         } finally {
             instrumentation.runOnMainSync { activity.finish() }
         }
@@ -184,7 +184,7 @@ class VehicleDataServiceTest {
             .setAction(VehicleDataService.ACTION_STOP)
 
         try {
-            assertTrue(waitUntil { viewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { viewModel.isConnected.value })
             assertFalse(viewModel.isRunning.value)
             context.startService(start)
             context.startService(start)
@@ -202,7 +202,7 @@ class VehicleDataServiceTest {
             assertFalse(viewModel.isRunning.value)
             assertTrue(viewModel.isConnected.value)
             instrumentation.runOnMainSync { activity.finish() }
-            assertTrue(waitUntil { !viewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { !viewModel.isConnected.value })
         } finally {
             context.stopService(Intent(context, VehicleDataService::class.java))
             instrumentation.runOnMainSync { activity.finish() }
@@ -223,14 +223,14 @@ class VehicleDataServiceTest {
         var secondActivity: MainActivity? = null
 
         try {
-            assertTrue(waitUntil { firstViewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { firstViewModel.isConnected.value })
             context.startService(
                 Intent(context, VehicleDataService::class.java)
                     .setAction(VehicleDataService.ACTION_START)
             )
             assertTrue(waitUntil { firstViewModel.isRunning.value })
             instrumentation.runOnMainSync { firstActivity.finish() }
-            assertTrue(waitUntil { !firstViewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { !firstViewModel.isConnected.value })
 
             val reopened = instrumentation.startActivitySync(
                 Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -240,7 +240,7 @@ class VehicleDataServiceTest {
             instrumentation.runOnMainSync {
                 secondViewModel = ViewModelProvider(reopened)[VehicleViewModel::class.java]
             }
-            assertTrue(waitUntil { secondViewModel.isConnected.value })
+            assertTrue(waitUntil(ACTIVITY_CONNECTION_TIMEOUT_MS) { secondViewModel.isConnected.value })
             assertTrue(secondViewModel.isRunning.value)
             val stateAtRebind = secondViewModel.vehicleState.value
             assertTrue(waitUntil(8_000) { secondViewModel.vehicleState.value != stateAtRebind })
@@ -288,5 +288,10 @@ class VehicleDataServiceTest {
         override fun unregisterCallback(callback: IVehicleStateCallback) {
             unregisterCalls.incrementAndGet()
         }
+    }
+
+    private companion object {
+        // Cold service startup and Activity stop transitions can be slow on CI emulators.
+        const val ACTIVITY_CONNECTION_TIMEOUT_MS = 15_000L
     }
 }

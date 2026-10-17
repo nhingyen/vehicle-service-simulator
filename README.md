@@ -51,7 +51,7 @@ On Windows:
 
 The second command requires a running emulator or connected device. On macOS/Linux, use `./gradlew` in place of `.\gradlew.bat`.
 
-Unit tests cover simulation bounds and transitions. Instrumentation tests cover Parcel round trips, callback registration and removal across the process boundary, repeated Start/Stop commands, Activity unbind/rebind and background unbind, and callback error handling. [Android CI](.github/workflows/android-ci.yml) is configured to run build, unit tests, lint, and instrumentation tests on an API 35 emulator; the new CI emulator step still needs its first GitHub run.
+Unit tests cover simulation bounds and transitions. Instrumentation tests cover Parcel round trips, callback registration and removal across the process boundary, repeated Start/Stop commands, Activity unbind/rebind and background unbind, and callback error handling. [Android CI](.github/workflows/android-ci.yml) is configured to run build, unit tests, lint, and instrumentation tests on an API 35 emulator. The latest GitHub run reached instrumentation tests but failed three Activity connection timing assertions. All eight instrumentation tests pass locally after adjusting their Activity connection timeout; a CI rerun is pending.
 
 ## Project scope
 

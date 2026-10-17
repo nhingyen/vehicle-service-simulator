@@ -23,7 +23,7 @@ TASK-002  Compose Dashboard ← ViewModel StateFlow ← Simulation Engine (compl
 TASK-003  Simulation Engine ← lifecycle managed by Started Service (complete)
 TASK-004  Compose Dashboard ↔ Bound Service ↔ Simulation Engine (complete)
 TASK-005  Compose Dashboard ↔ AIDL ↔ Service ↔ Simulation Engine (complete)
-TASK-006  Tests, lifecycle checks, and demo documentation (implemented locally; CI run pending)
+TASK-006  Tests, lifecycle checks, and demo documentation (local checks pass; CI rerun pending)
 ```
 
 - **UI:** displays bound Service state through the ViewModel and sends Start/Stop Intent actions to the Service.
@@ -34,7 +34,7 @@ TASK-006  Tests, lifecycle checks, and demo documentation (implemented locally; 
 
 ## Verification and remaining checks
 
-Unit tests cover engine bounds, per-step changes, battery depletion, and door behavior. Instrumentation tests cover Parcelable round trips, real cross-process callback registration/unregistration, repeated Service commands, Activity unbind/rebind and background unbind, and ViewModel handling of stale callbacks and registration failure. The existing CI workflow runs build, unit tests, and lint, then starts an API 35 emulator for instrumentation tests. The new emulator step has not yet been verified on GitHub.
+Unit tests cover engine bounds, per-step changes, battery depletion, and door behavior. Instrumentation tests cover Parcelable round trips, real cross-process callback registration/unregistration, repeated Service commands, Activity unbind/rebind and background unbind, and ViewModel handling of stale callbacks and registration failure. The CI workflow runs build, unit tests, lint, and instrumentation tests on an API 35 emulator. Its latest GitHub run reached instrumentation but failed three Activity connection timing assertions. All eight instrumentation tests pass locally after adjusting the timeout for Activity connection transitions; CI rerun is pending.
 
 Process death, `onBindingDied` recovery, and return from background still need manual checks on a device or emulator. The Service does not persist state across process death or promise continuous background updates.
 
