@@ -30,4 +30,42 @@ class VehicleSimulationEngineTest {
         assertEquals(0, state.speed)
         assertEquals(0, state.battery)
     }
+
+    @Test
+    fun eachStepChangesValuesWithinExpectedRange() {
+        val current = VehicleState(60, 100, 40, true)
+
+        repeat(1_000) {
+            val next = engine.next(current)
+            assertTrue(next.speed - current.speed in -4..6)
+            assertTrue(next.battery in 99..100)
+            assertTrue(next.temperature - current.temperature in -1..1)
+            assertFalse(next.doorOpen)
+        }
+    }
+
+    @Test
+    fun consumingLastBatteryStopsVehicleImmediately() {
+        val next = VehicleSimulationEngine(ZeroRandom).next(
+            VehicleState(speed = 60, battery = 1, temperature = 40, doorOpen = false)
+        )
+
+        assertEquals(0, next.speed)
+        assertEquals(0, next.battery)
+    }
+
+    @Test
+    fun doorCanToggleOnlyWhenStationary() {
+        val stationary = VehicleState(speed = 0, battery = 0, temperature = 40, doorOpen = false)
+        val next = VehicleSimulationEngine(ZeroRandom).next(stationary)
+
+        assertTrue(next.doorOpen)
+        assertFalse(VehicleSimulationEngine(ZeroRandom).next(
+            VehicleState(speed = 60, battery = 100, temperature = 40, doorOpen = true)
+        ).doorOpen)
+    }
+
+    private object ZeroRandom : Random() {
+        override fun nextBits(bitCount: Int): Int = 0
+    }
 }

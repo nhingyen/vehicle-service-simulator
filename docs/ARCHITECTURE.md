@@ -23,6 +23,7 @@ TASK-002  Compose Dashboard ← ViewModel StateFlow ← Simulation Engine (compl
 TASK-003  Simulation Engine ← lifecycle managed by Started Service (complete)
 TASK-004  Compose Dashboard ↔ Bound Service ↔ Simulation Engine (complete)
 TASK-005  Compose Dashboard ↔ AIDL ↔ Service ↔ Simulation Engine (complete)
+TASK-006  Tests, lifecycle checks, and demo documentation (implemented locally; CI run pending)
 ```
 
 - **UI:** displays bound Service state through the ViewModel and sends Start/Stop Intent actions to the Service.
@@ -30,5 +31,11 @@ TASK-005  Compose Dashboard ↔ AIDL ↔ Service ↔ Simulation Engine (complete
 - **Service:** manages the simulation Job and coroutine scope according to the Android lifecycle.
 - **Bound Service:** exposes an AIDL Binder; the Activity owns its binding lifecycle.
 - **AIDL:** registers callbacks and delivers Parcelable snapshots from `:vehicle` to the UI process.
+
+## Verification and remaining checks
+
+Unit tests cover engine bounds, per-step changes, battery depletion, and door behavior. Instrumentation tests cover Parcelable round trips, real cross-process callback registration/unregistration, repeated Service commands, Activity unbind/rebind and background unbind, and ViewModel handling of stale callbacks and registration failure. The existing CI workflow runs build, unit tests, and lint, then starts an API 35 emulator for instrumentation tests. The new emulator step has not yet been verified on GitHub.
+
+Process death, `onBindingDied` recovery, and return from background still need manual checks on a device or emulator. The Service does not persist state across process death or promise continuous background updates.
 
 Keep the structure simple and in one module until a concrete requirement calls for more. See [`PROJECT.md`](PROJECT.md) for scope and task order.

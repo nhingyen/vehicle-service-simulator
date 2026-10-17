@@ -9,6 +9,7 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 - One `:app` module; package/namespace and application ID: `com.ngyennhi.vehicleservicesimulator`.
 - `MainActivity` binds while started to `VehicleDataService` in the `:vehicle` process. AIDL callbacks deliver vehicle snapshots to `VehicleViewModel`, and the dashboard shows connection status. Start/Stop Intent actions still control the single Service simulation loop, which updates state once per second.
 - Current configuration: Kotlin 2.2.10, Android Gradle Plugin 9.4.1, Gradle wrapper 9.6.0, Compose Material 3, `minSdk` 26, and `compileSdk`/`targetSdk` 37.
+- Local unit and instrumentation tests cover engine rules, Parcelable snapshots, AIDL callbacks, Service commands, and Activity rebind. CI is configured to run build, unit tests, lint, and emulator tests; the emulator step has not yet been verified in a GitHub run.
 
 ## MVP Scope
 
@@ -34,4 +35,4 @@ Learn native Android development with Kotlin and Jetpack Compose, focusing on da
 | TASK-005 | Add AIDL communication to practice crossing a process boundary. |
 | TASK-006 | Test key flows, handle lifecycle and error cases, and finish demo documentation. |
 
-TASK-001 through TASK-005 are complete. Start later tasks only when requested.
+TASK-001 through TASK-005 are complete. TASK-006 implementation and local checks are complete; its new CI emulator step still needs a GitHub run, and process-death/return-from-background behavior needs manual review. Start later tasks only when requested.
