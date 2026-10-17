@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ngyennhi.vehicleservicesimulator.MainActivity
+import com.ngyennhi.vehicleservicesimulator.ipc.IVehicleDataService
+import com.ngyennhi.vehicleservicesimulator.ipc.IVehicleStateCallback
+import com.ngyennhi.vehicleservicesimulator.ipc.VehicleSnapshot
 import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -15,6 +18,39 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class VehicleDataServiceTest {
+    @Test
+    fun lateCallbackFromOldConnectionIsIgnored() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val viewModel = VehicleViewModel()
+        val firstService = CallbackCapturingService()
+        val secondService = CallbackCapturingService()
+
+        try {
+            instrumentation.runOnMainSync { viewModel.connect(firstService) }
+            assertTrue(waitUntil { firstService.callback != null })
+            val oldCallback = firstService.callback!!
+
+            instrumentation.runOnMainSync { viewModel.connect(secondService) }
+            assertTrue(waitUntil { secondService.callback != null })
+            val current = VehicleSnapshot(42, 80, 30, false, true)
+            secondService.callback!!.onSnapshot(current)
+            assertTrue(waitUntil { viewModel.vehicleState.value == current.toVehicleState() })
+
+            oldCallback.onSnapshot(VehicleSnapshot(1, 1, 1, true, false))
+            instrumentation.waitForIdleSync()
+            assertEquals(current.toVehicleState(), viewModel.vehicleState.value)
+            assertTrue(viewModel.isConnected.value)
+
+            instrumentation.runOnMainSync { viewModel.disconnect() }
+            oldCallback.onSnapshot(VehicleSnapshot(2, 2, 2, true, true))
+            instrumentation.waitForIdleSync()
+            assertFalse(viewModel.isConnected.value)
+            assertEquals(current.toVehicleState(), viewModel.vehicleState.value)
+        } finally {
+            instrumentation.runOnMainSync { viewModel.disconnect() }
+        }
+    }
+
     @Test
     fun repeatedCommandsStopUpdatesAndKeepLastState() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -108,5 +144,15 @@ class VehicleDataServiceTest {
             SystemClock.sleep(20)
         }
         return condition()
+    }
+
+    private class CallbackCapturingService : IVehicleDataService.Stub() {
+        @Volatile var callback: IVehicleStateCallback? = null
+
+        override fun registerCallback(callback: IVehicleStateCallback) {
+            this.callback = callback
+        }
+
+        override fun unregisterCallback(callback: IVehicleStateCallback) = Unit
     }
 }

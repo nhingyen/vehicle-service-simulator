@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/** State shared by the Service and dashboard while they run in the same process. */
+/** State owned by the Service process; the dashboard receives snapshots over AIDL. */
 internal object VehicleSimulationState {
     private val _vehicleState = MutableStateFlow(SampleVehicleData.vehicleState)
     val vehicleState: StateFlow<VehicleState> = _vehicleState.asStateFlow()

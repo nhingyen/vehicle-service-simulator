@@ -25,7 +25,8 @@
         </activity>
         <service
             android:name=".service.VehicleDataService"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":vehicle" />
     </application>
 
 </manifest>

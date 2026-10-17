@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
+import com.ngyennhi.vehicleservicesimulator.ipc.IVehicleDataService
 import com.ngyennhi.vehicleservicesimulator.service.VehicleDataService
 import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleDashboard
 import com.ngyennhi.vehicleservicesimulator.ui.dashboard.VehicleViewModel
@@ -27,13 +28,34 @@ import com.ngyennhi.vehicleservicesimulator.ui.theme.VehicleServiceSimulatorThem
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: VehicleViewModel
     private var isBound = false
+    private var bindingRecoveryUsed = false
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-            if (isBound) viewModel.connect(binder as VehicleDataService.LocalBinder)
+            if (isBound) viewModel.connect(IVehicleDataService.Stub.asInterface(binder))
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             viewModel.disconnect()
+        }
+
+        override fun onBindingDied(name: ComponentName) {
+            viewModel.disconnect()
+            if (isBound) {
+                unbindService(this)
+                isBound = false
+                if (!bindingRecoveryUsed) {
+                    bindingRecoveryUsed = true
+                    bindVehicleService()
+                }
+            }
+        }
+
+        override fun onNullBinding(name: ComponentName) {
+            viewModel.disconnect()
+            if (isBound) {
+                unbindService(this)
+                isBound = false
+            }
         }
     }
 
@@ -68,6 +90,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+        bindingRecoveryUsed = false
+        bindVehicleService()
+    }
+
+    private fun bindVehicleService() {
+        if (isBound) return
         isBound = bindService(
             Intent(this, VehicleDataService::class.java),
             serviceConnection,
